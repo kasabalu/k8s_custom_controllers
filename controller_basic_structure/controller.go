@@ -26,7 +26,7 @@ func newController(clientset kubernetes.Interface, depInformer appsinformers.Dep
 		depCacheSynced: depInformer.Informer().HasSynced, // HasSynced returns true if the shared informer's store has been
 		// informed by at least one full LIST of the authoritative state
 		// of the informer's object collection.  This is unrelated to "resync".
-		queue: workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "ekspose"),
+		queue: workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "cntroller-test"),
 	}
 
 	depInformer.Informer().AddEventHandler(
@@ -41,8 +41,9 @@ func newController(clientset kubernetes.Interface, depInformer appsinformers.Dep
 
 func (c *controller) run(ch <-chan struct{}) {
 	fmt.Println("starting controller")
+	// Informer maintain cache, making sure Informer cache synced successfully
 	if !cache.WaitForCacheSync(ch, c.depCacheSynced) {
-		fmt.Print("waiting for cache to be synced\n")
+		fmt.Println("waiting for cache to be synced")
 	}
 
 	go wait.Until(c.worker, 1*time.Second, ch)
@@ -50,7 +51,7 @@ func (c *controller) run(ch <-chan struct{}) {
 	<-ch
 }
 func (c *controller) worker() {
-	fmt.Println(c.depLister.Deployments("minio-api"))
+	//fmt.Println(c.depLister.Deployments("minio-api"))
 
 }
 
