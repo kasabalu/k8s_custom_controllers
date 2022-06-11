@@ -22,7 +22,7 @@ type controller struct {
 func newController(clientset kubernetes.Interface, depInformer appsinformers.DeploymentInformer) *controller {
 	c := &controller{
 		clientset:      clientset,
-		depLister:      depInformer.Lister(),
+		depLister:      depInformer.Lister(),             // informer has Lister
 		depCacheSynced: depInformer.Informer().HasSynced, // HasSynced returns true if the shared informer's store has been
 		// informed by at least one full LIST of the authoritative state
 		// of the informer's object collection.  This is unrelated to "resync".
@@ -48,6 +48,10 @@ func (c *controller) run(ch <-chan struct{}) {
 	go wait.Until(c.worker, 1*time.Second, ch)
 
 	<-ch
+}
+func (c *controller) worker() {
+	fmt.Println(c.depLister.Deployments("minio-api"))
+
 }
 
 func handleAdd(obj interface{}) {
