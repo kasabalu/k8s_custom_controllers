@@ -27,7 +27,9 @@ func main() {
 	ch := make(chan struct{})
 	informers := informers.NewSharedInformerFactory(clientset, 10*time.Minute)
 	c := newController(clientset, informers.Apps().V1().Deployments())
+
 	informers.Start(ch)
+
 	c.run(ch)
 	fmt.Println(informers)
 
